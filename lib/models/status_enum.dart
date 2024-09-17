@@ -1,0 +1,1 @@
+enum Status {completed, in_progress, pending}
