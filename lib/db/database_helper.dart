@@ -17,6 +17,16 @@ class DatabaseHelper {
     return _database!;
   }
 
+  Future<void> deleteOldDatabase() async {
+    String path = join(await getDatabasesPath(), "tasks.db");
+    try {
+      await deleteDatabase(path);
+      print("Old database deleted.");
+    } catch (e) {
+      print("Error deleting old database: $e");
+    }
+  }
+
   Future<Database> _initDatabase() async {
     final documentsDirectory = await getApplicationDocumentsDirectory();
     final path = join(documentsDirectory.path, 'tasks.db');
@@ -29,6 +39,7 @@ class DatabaseHelper {
           CREATE TABLE tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT,
+            description TEXT,
             imagePath TEXT,
             status INTEGER,
             priority INTEGER

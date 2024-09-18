@@ -17,7 +17,7 @@ class _TaskPageState extends State<AddTaskPage> {
   List<Task> _tasks = [];
 
   final _titleController = TextEditingController();
-  final _imagePathController = TextEditingController();
+  final _descriptionController = TextEditingController();
   Status _selectedStatus = Status.pending;
   Priority _selectedPriority = Priority.low;
 
@@ -35,19 +35,19 @@ class _TaskPageState extends State<AddTaskPage> {
   }
 
   Future<void> _addTask() async {
-    if (_titleController.text.isEmpty || _imagePathController.text.isEmpty)
+    if (_titleController.text.isEmpty || _descriptionController.text.isEmpty)
       return;
 
     Task newTask = Task(
       title: _titleController.text,
-      imagePath: _imagePathController.text,
+      description: _descriptionController.text,
       status: _selectedStatus,
       priority: _selectedPriority,
     );
     await _dbHelper.addTask(newTask);
     print(newTask);
     _titleController.clear();
-    _imagePathController.clear();
+    _descriptionController.clear();
     setState(() {
       _tasks.add(newTask);
     });
@@ -64,10 +64,10 @@ class _TaskPageState extends State<AddTaskPage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: "Task Page",
       theme: ThemeData(
-          scaffoldBackgroundColor: Colors.deepOrangeAccent,
-          hintColor: Colors.blue),
+          scaffoldBackgroundColor: Colors.blueGrey, hintColor: Colors.blue),
       home: Scaffold(
         appBar: AppBar(
           title: Text('Task Manager'),
@@ -83,18 +83,8 @@ class _TaskPageState extends State<AddTaskPage> {
                     decoration: InputDecoration(labelText: 'Title'),
                   ),
                   TextFormField(
-                    controller: _imagePathController,
-                    decoration: InputDecoration(labelText: 'Image URL'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter an image URL';
-                      }
-                      // Validate if the image URL is valid
-                      if (!_isValidImageUrl(value)) {
-                        return 'Please enter a valid image URL';
-                      }
-                      return null;
-                    },
+                    controller: _descriptionController,
+                    decoration: InputDecoration(labelText: 'Description'),
                   ),
                   DropdownButton<Status>(
                     value: _selectedStatus,
@@ -153,11 +143,4 @@ class _TaskPageState extends State<AddTaskPage> {
       ),
     );
   }
-
-  bool _isValidImageUrl(String url) {
-    final uri = Uri.tryParse(url);
-    return uri != null && (uri.isScheme('http') || uri.isScheme('https'));
-  }
-
-  void addAndGoBack() {}
 }

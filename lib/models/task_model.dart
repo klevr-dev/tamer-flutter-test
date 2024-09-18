@@ -4,13 +4,15 @@ import 'package:tamer_task/models/status_enum.dart';
 class Task {
   int? id;
   final String? title;
+  final String? description;
   final String? imagePath;
   final Status? status;
   final Priority? priority;
 
   Task(
       {this.id,
-      required this.imagePath,
+      this.description,
+      this.imagePath,
       required this.title,
       required this.status,
       required this.priority});
@@ -19,6 +21,7 @@ class Task {
     return {
       'id': id,
       'title': title,
+      'description': description,
       'imagePath': imagePath,
       'status': status?.index,
       'priority': priority?.index,
@@ -29,6 +32,7 @@ class Task {
     return Task(
       id: map['id'],
       title: map['title'],
+      description: map['description'],
       imagePath: map['imagePath'],
       status: Status.values[map['status']],
       priority: Priority.values[map['priority']],

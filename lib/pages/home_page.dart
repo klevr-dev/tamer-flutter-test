@@ -33,10 +33,10 @@ class _HomePageState extends State<HomePage> {
         title: Text('All Tasks'),
         actions: [
           IconButton(
-            icon: Icon(Icons.add),
+            icon: Icon(size: 30, Icons.add),
             onPressed: () async {
               final result = await Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => AddTaskPage()));
+                  MaterialPageRoute(builder: (context) => const AddTaskPage()));
               if (result == true) {
                 _loadTasks();
               }
@@ -51,20 +51,25 @@ class _HomePageState extends State<HomePage> {
               itemBuilder: (context, index) {
                 final task = _tasks[index];
                 return ListTile(
-                  leading: Image.network(task.imagePath!), // Displaying image
                   title: Text(task.title!),
                   subtitle: Text(
                     'Priority: ${task.priority.toString().split('.').last} - Status: ${task.status.toString().split('.').last}',
                   ),
                   trailing: IconButton(
-                    icon: Icon(Icons.delete),
+                    icon: Icon(Icons.check),
                     onPressed: () {
                       _deleteTask(task.id!);
                     },
                   ),
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => TaskDetails()));
+                  onTap: () async {
+                    final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                TaskDetails(currentTask: task)));
+                    if (result == true) {
+                      _loadTasks();
+                    }
                   },
                 );
               },
