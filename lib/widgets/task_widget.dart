@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import '../models/priority_enum.dart';
 import '../models/status_enum.dart';
 
@@ -9,12 +10,7 @@ class TaskWidget extends StatefulWidget {
   final Status? status;
 
   const TaskWidget(
-      {super.key,
-        this.title,
-        this.imagePath,
-        this.priority,
-        this.status
-      });
+      {super.key, this.title, this.imagePath, this.priority, this.status});
 
   @override
   State<TaskWidget> createState() => _TaskWidgetState();
@@ -24,29 +20,39 @@ class _TaskWidgetState extends State<TaskWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10.0),
+          border: Border.all(color: Colors.black, width: 2.0)),
+      padding: EdgeInsets.all(16),
       child: Row(
-              children: [
-              Column(
-              children: [
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
-
+                widget.title!,
+                style: TextStyle(),
               ),
               Row(
-                  children: [
+                children: [
                   Text(
-                  widget.priority!,
-                  style: TextStyle(),
-                ),
+                    'Priority: ${widget.priority}',
+                    style: TextStyle(),
+                  ),
+                  SizedBox(
+                    width: 50,
+                  ),
                   Text(
-                  widget.status!
-                  style: TextStyle(),
-              )],
-            )
-
+                    'Status: ${widget.status}',
+                    style: TextStyle(),
+                  )
+                ],
+              )
             ],
-        )
+          )
         ],
-          ),
+      ),
     );
   }
 }
