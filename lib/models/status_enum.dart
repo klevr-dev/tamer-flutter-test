@@ -1,7 +1,7 @@
 enum Status {
-  completed,
+  pending,
   in_progress,
-  pending;
+  completed;
 
   @override
   String toString() {

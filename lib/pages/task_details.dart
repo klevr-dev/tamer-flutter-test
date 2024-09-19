@@ -22,6 +22,8 @@ class _TaskDetailsState extends State<TaskDetails> {
     // TODO: implement initState
     super.initState();
     _task = widget.currentTask;
+    print(widget.currentTask.priority!.index);
+    print(widget.currentTask.priority.toString());
   }
 
   @override

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/priority_enum.dart';
+import '../models/status_enum.dart';
 import '../models/task_model.dart'; // Import your Task model
 
 class EditTaskPage extends StatefulWidget {
@@ -12,31 +13,30 @@ class EditTaskPage extends StatefulWidget {
 }
 
 class _EditTaskPageState extends State<EditTaskPage>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  late TabController _tabController;
+  late TabController _tabControllerPriority;
+  late TabController _tabControllerStatus;
 
   @override
   void initState() {
     super.initState();
     _titleController.text = widget.currentTask.title!;
     _descriptionController.text = widget.currentTask.description ?? '';
-    _tabController = TabController(length: 2, vsync: this);
+    _tabControllerPriority = TabController(length: 2, vsync: this);
+    _tabControllerStatus = TabController(length: 3, vsync: this);
 
-    if (widget.currentTask.priority == Priority.high) {
-      _tabController.index = 1;
-    } else {
-      _tabController.index = 0;
-    }
+    _tabControllerPriority.index = widget.currentTask.priority!.index;
+    _tabControllerStatus.index = widget.currentTask.status!.index;
   }
 
   Priority _getPriorityFromTabIndex(int index) {
-    if (index == 1) {
-      return Priority.high;
-    } else {
-      return Priority.low;
-    }
+    return Priority.values[index];
+  }
+
+  Status _getStatusFromTabIndex(int index) {
+    return Status.values[index];
   }
 
   @override
@@ -52,8 +52,9 @@ class _EditTaskPageState extends State<EditTaskPage>
                 id: widget.currentTask.id,
                 title: _titleController.text,
                 description: _descriptionController.text,
-                status: widget.currentTask.status,
-                priority: _getPriorityFromTabIndex(_tabController.index),
+                status: _getStatusFromTabIndex(_tabControllerStatus.index),
+                priority:
+                    _getPriorityFromTabIndex(_tabControllerPriority.index),
               );
 
               Navigator.pop(context, updatedTask);
@@ -86,7 +87,7 @@ class _EditTaskPageState extends State<EditTaskPage>
             ),
             Container(
                 width: 200,
-                height: 50,
+                height: 40,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(32.0),
                   color: Colors.grey[300],
@@ -96,13 +97,41 @@ class _EditTaskPageState extends State<EditTaskPage>
                     indicatorSize: TabBarIndicatorSize.tab,
                     dividerColor: Colors.transparent,
                     labelColor: Colors.white,
-                    controller: _tabController,
+                    controller: _tabControllerPriority,
                     indicator: BoxDecoration(
                         color: Colors.indigoAccent,
                         borderRadius: BorderRadius.circular(32.0)),
                     tabs: [
                       Tab(text: "Low"),
                       Tab(text: "High"),
+                    ])),
+            SizedBox(
+              height: 15,
+            ),
+            Text("Status"),
+            SizedBox(
+              height: 15,
+            ),
+            Container(
+                width: 350,
+                height: 40,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(32.0),
+                  color: Colors.grey[300],
+                ),
+                child: TabBar(
+                    splashFactory: NoSplash.splashFactory,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    dividerColor: Colors.transparent,
+                    labelColor: Colors.white,
+                    controller: _tabControllerStatus,
+                    indicator: BoxDecoration(
+                        color: Colors.indigoAccent,
+                        borderRadius: BorderRadius.circular(32.0)),
+                    tabs: [
+                      Tab(text: "Pending"),
+                      Tab(text: "In Progress"),
+                      Tab(text: "Completed"),
                     ])),
           ],
         ),

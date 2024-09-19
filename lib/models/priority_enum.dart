@@ -1,6 +1,6 @@
 enum Priority {
-  high,
-  low;
+  low,
+  high;
 
   @override
   String toString() {
