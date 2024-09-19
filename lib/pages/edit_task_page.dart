@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/priority_enum.dart';
 import '../models/task_model.dart'; // Import your Task model
 
 class EditTaskPage extends StatefulWidget {
@@ -10,15 +11,32 @@ class EditTaskPage extends StatefulWidget {
   _EditTaskPageState createState() => _EditTaskPageState();
 }
 
-class _EditTaskPageState extends State<EditTaskPage> {
+class _EditTaskPageState extends State<EditTaskPage>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     _titleController.text = widget.currentTask.title!;
     _descriptionController.text = widget.currentTask.description ?? '';
+    _tabController = TabController(length: 2, vsync: this);
+
+    if (widget.currentTask.priority == Priority.high) {
+      _tabController.index = 1;
+    } else {
+      _tabController.index = 0;
+    }
+  }
+
+  Priority _getPriorityFromTabIndex(int index) {
+    if (index == 1) {
+      return Priority.high;
+    } else {
+      return Priority.low;
+    }
   }
 
   @override
@@ -35,7 +53,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
                 title: _titleController.text,
                 description: _descriptionController.text,
                 status: widget.currentTask.status,
-                priority: widget.currentTask.priority,
+                priority: _getPriorityFromTabIndex(_tabController.index),
               );
 
               Navigator.pop(context, updatedTask);
@@ -67,16 +85,25 @@ class _EditTaskPageState extends State<EditTaskPage> {
               height: 15,
             ),
             Container(
-              width: 500,
-              height: 50,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(32.0),
-                color: Colors.grey[300],
-              ),
-              child: Row(
-                children: [],
-              ),
-            ),
+                width: 200,
+                height: 50,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(32.0),
+                  color: Colors.grey[300],
+                ),
+                child: TabBar(
+                    splashFactory: NoSplash.splashFactory,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    dividerColor: Colors.transparent,
+                    labelColor: Colors.white,
+                    controller: _tabController,
+                    indicator: BoxDecoration(
+                        color: Colors.indigoAccent,
+                        borderRadius: BorderRadius.circular(32.0)),
+                    tabs: [
+                      Tab(text: "Low"),
+                      Tab(text: "High"),
+                    ])),
           ],
         ),
       ),

@@ -3,6 +3,7 @@ import 'package:tamer_task/pages/add_task_page.dart';
 import 'package:tamer_task/pages/task_details.dart';
 import '../db/database_helper.dart';
 import '../models/task_model.dart';
+import 'package:image_picker/image_picker.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -51,6 +52,8 @@ class _HomePageState extends State<HomePage> {
               itemBuilder: (context, index) {
                 final task = _tasks[index];
                 return ListTile(
+                  leading:
+                      IconButton(onPressed: () {}, icon: Icon(Icons.image)),
                   title: Text(task.title!),
                   subtitle: Text(
                     'Priority: ${task.priority.toString().split('.').last} - Status: ${task.status.toString().split('.').last}',
