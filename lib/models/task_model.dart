@@ -3,11 +3,11 @@ import 'package:tamer_task/models/status_enum.dart';
 
 class Task {
   int? id;
-  final String? title;
-  final String? description;
-  final String? imagePath;
-  final Status? status;
-  final Priority? priority;
+  String? title;
+  String? description;
+  String? imagePath;
+  Status? status;
+  Priority? priority;
 
   Task(
       {this.id,

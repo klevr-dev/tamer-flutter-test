@@ -71,6 +71,14 @@ class _TaskPageState extends State<AddTaskPage> {
       home: Scaffold(
         appBar: AppBar(
           title: Text('Task Manager'),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.cancel_outlined),
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+            )
+          ],
         ),
         body: Column(
           children: [
@@ -121,23 +129,23 @@ class _TaskPageState extends State<AddTaskPage> {
                 ],
               ),
             ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: _tasks.length,
-                itemBuilder: (context, index) {
-                  final task = _tasks[index];
-                  return ListTile(
-                    title: Text(task.title!),
-                    subtitle: Text(
-                        'Priority: ${task.priority.toString().split('.').last} - Status: ${task.status.toString().split('.').last}'),
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete),
-                      onPressed: () => _deleteTask(task.id!),
-                    ),
-                  );
-                },
-              ),
-            ),
+            // Expanded(
+            //   child: ListView.builder(
+            //     itemCount: _tasks.length,
+            //     itemBuilder: (context, index) {
+            //       final task = _tasks[index];
+            //       return ListTile(
+            //         title: Text(task.title!),
+            //         subtitle: Text(
+            //             'Priority: ${task.priority.toString().split('.').last} - Status: ${task.status.toString().split('.').last}'),
+            //         trailing: IconButton(
+            //           icon: Icon(Icons.delete),
+            //           onPressed: () => _deleteTask(task.id!),
+            //         ),
+            //       );
+            //     },
+            //   ),
+            // ),
           ],
         ),
       ),

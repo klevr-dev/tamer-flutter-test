@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../db/database_helper.dart';
+import '../models/status_enum.dart';
 import '../models/task_model.dart';
 import 'edit_task_page.dart';
 
@@ -98,28 +99,48 @@ class _TaskDetailsState extends State<TaskDetails> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  GestureDetector(
-                    child: Container(
-                      width: 150,
-                      height: 40,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16.0),
-                          color: Colors.white),
-                      child: Center(
-                        child: Text(
-                            style: TextStyle(
-                                color: Colors.blueGrey,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16.0),
-                            textAlign: TextAlign.right,
-                            "Mark Completed"),
-                      ),
-                    ),
-                    onTap: () {
-                      _dbHelper.deleteTask(widget.currentTask.id!);
-                      Navigator.pop(context, true);
-                    },
-                  ),
+                  _task.status == Status.completed
+                      ? Container(
+                          width: 100,
+                          height: 40,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16.0),
+                              color: Colors.green),
+                          child: Center(
+                            child: Text(
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16.0),
+                                textAlign: TextAlign.right,
+                                "Completed"),
+                          ),
+                        )
+                      : GestureDetector(
+                          child: Container(
+                            width: 150,
+                            height: 40,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16.0),
+                                color: Colors.white),
+                            child: Center(
+                              child: Text(
+                                  style: TextStyle(
+                                      color: Colors.blueGrey,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16.0),
+                                  textAlign: TextAlign.right,
+                                  "Mark Completed"),
+                            ),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              _task.status = Status.completed;
+                            });
+                            _dbHelper.updateTaskStatus(widget.currentTask);
+                            Navigator.pop(context, true);
+                          },
+                        ),
                 ],
               )
             ],

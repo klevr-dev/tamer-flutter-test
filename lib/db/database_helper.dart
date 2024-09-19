@@ -76,6 +76,18 @@ class DatabaseHelper {
     );
   }
 
+  Future<int> updateTaskStatus(Task task) async {
+    final db = await database;
+    return await db.update(
+      'tasks',
+      {
+        'status': task.status!.index,
+      },
+      where: 'id = ?',
+      whereArgs: [task.id],
+    );
+  }
+
   // Delete a task from the tasks table
   Future<int> deleteTask(int id) async {
     final db = await database;
