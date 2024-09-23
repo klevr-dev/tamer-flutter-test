@@ -35,8 +35,7 @@ class _TaskPageState extends State<AddTaskPage> {
   }
 
   Future<void> _addTask() async {
-    if (_titleController.text.isEmpty || _descriptionController.text.isEmpty)
-      return;
+    if (_titleController.text.isEmpty) return;
 
     Task newTask = Task(
       title: _titleController.text,

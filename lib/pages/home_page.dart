@@ -66,6 +66,7 @@ class _HomePageState extends State<HomePage> {
           : Padding(
               padding: const EdgeInsets.all(8.0),
               child: ListView.builder(
+                scrollDirection: Axis.vertical,
                 itemCount: _tasks.length,
                 itemBuilder: (context, index) {
                   final task = _tasks[index];
