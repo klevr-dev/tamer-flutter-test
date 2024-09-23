@@ -75,6 +75,7 @@ class _EditTaskPageState extends State<EditTaskPage>
               height: 15,
             ),
             TextField(
+              maxLines: null,
               controller: _descriptionController,
               decoration: InputDecoration(labelText: 'Task Description'),
             ),

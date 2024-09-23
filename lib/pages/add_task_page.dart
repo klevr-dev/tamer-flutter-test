@@ -91,6 +91,7 @@ class _TaskPageState extends State<AddTaskPage> {
                     decoration: InputDecoration(labelText: 'Title'),
                   ),
                   TextFormField(
+                    maxLines: null,
                     controller: _descriptionController,
                     decoration: InputDecoration(labelText: 'Description'),
                   ),
