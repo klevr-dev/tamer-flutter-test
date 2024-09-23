@@ -60,92 +60,94 @@ class _TaskDetailsState extends State<TaskDetails> {
                 icon: Icon(Icons.edit))
           ],
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                _task.title!,
-                style: TextStyle(fontSize: 24),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              if (_task.description != null && _task.description!.isNotEmpty)
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Text(
-                  _task.description!,
-                  style: TextStyle(fontSize: 18),
-                )
-              else
-                Text(
-                  'No description available.',
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontStyle: FontStyle.italic,
-                      color: Colors.black),
+                  _task.title!,
+                  style: TextStyle(fontSize: 24),
                 ),
-              SizedBox(
-                height: 20,
-              ),
-              Text("Status: ${_task.status.toString()}",
-                  style: TextStyle(fontSize: 16)),
-              SizedBox(
-                height: 20,
-              ),
-              Text("Priority: ${_task.priority.toString()}",
-                  style: TextStyle(fontSize: 16)),
-              SizedBox(
-                height: 80,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  _task.status == Status.completed
-                      ? Container(
-                          width: 100,
-                          height: 40,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16.0),
-                              color: Colors.green),
-                          child: Center(
-                            child: Text(
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16.0),
-                                textAlign: TextAlign.right,
-                                "Completed"),
-                          ),
-                        )
-                      : GestureDetector(
-                          child: Container(
-                            width: 150,
+                SizedBox(
+                  height: 20,
+                ),
+                if (_task.description != null && _task.description!.isNotEmpty)
+                  Text(
+                    _task.description!,
+                    style: TextStyle(fontSize: 18),
+                  )
+                else
+                  Text(
+                    'No description available.',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontStyle: FontStyle.italic,
+                        color: Colors.black),
+                  ),
+                SizedBox(
+                  height: 20,
+                ),
+                Text("Status: ${_task.status.toString()}",
+                    style: TextStyle(fontSize: 16)),
+                SizedBox(
+                  height: 20,
+                ),
+                Text("Priority: ${_task.priority.toString()}",
+                    style: TextStyle(fontSize: 16)),
+                SizedBox(
+                  height: 80,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    _task.status == Status.completed
+                        ? Container(
+                            width: 100,
                             height: 40,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16.0),
-                                color: Colors.white),
+                                color: Colors.green),
                             child: Center(
                               child: Text(
                                   style: TextStyle(
-                                      color: Colors.blueGrey,
+                                      color: Colors.white,
                                       fontWeight: FontWeight.w600,
                                       fontSize: 16.0),
                                   textAlign: TextAlign.right,
-                                  "Mark Completed"),
+                                  "Completed"),
                             ),
+                          )
+                        : GestureDetector(
+                            child: Container(
+                              width: 150,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16.0),
+                                  color: Colors.white),
+                              child: Center(
+                                child: Text(
+                                    style: TextStyle(
+                                        color: Colors.blueGrey,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16.0),
+                                    textAlign: TextAlign.right,
+                                    "Mark Completed"),
+                              ),
+                            ),
+                            onTap: () {
+                              setState(() {
+                                _task.status = Status.completed;
+                              });
+                              _dbHelper.updateTaskStatus(widget.currentTask);
+                              Navigator.pop(context, true);
+                            },
                           ),
-                          onTap: () {
-                            setState(() {
-                              _task.status = Status.completed;
-                            });
-                            _dbHelper.updateTaskStatus(widget.currentTask);
-                            Navigator.pop(context, true);
-                          },
-                        ),
-                ],
-              )
-            ],
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),

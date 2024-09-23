@@ -80,57 +80,55 @@ class _TaskPageState extends State<AddTaskPage> {
             )
           ],
         ),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  TextField(
-                    controller: _titleController,
-                    decoration: InputDecoration(labelText: 'Title'),
-                  ),
-                  TextFormField(
-                    maxLines: null,
-                    controller: _descriptionController,
-                    decoration: InputDecoration(labelText: 'Description'),
-                  ),
-                  DropdownButton<Status>(
-                    value: _selectedStatus,
-                    onChanged: (Status? newStatus) {
-                      setState(() {
-                        _selectedStatus = newStatus!;
-                      });
-                    },
-                    items: Status.values.map((status) {
-                      return DropdownMenuItem(
-                        value: status,
-                        child: Text(status.toString().split('.').last),
-                      );
-                    }).toList(),
-                  ),
-                  DropdownButton<Priority>(
-                    value: _selectedPriority,
-                    onChanged: (Priority? newPriority) {
-                      setState(() {
-                        _selectedPriority = newPriority!;
-                      });
-                    },
-                    items: Priority.values.map((priority) {
-                      return DropdownMenuItem(
-                        value: priority,
-                        child: Text(priority.toString().split('.').last),
-                      );
-                    }).toList(),
-                  ),
-                  ElevatedButton(
-                    onPressed: _addTask,
-                    child: Text('Add Task'),
-                  ),
-                ],
-              ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                TextField(
+                  controller: _titleController,
+                  decoration: InputDecoration(labelText: 'Title'),
+                ),
+                TextFormField(
+                  maxLines: null,
+                  controller: _descriptionController,
+                  decoration: InputDecoration(labelText: 'Description'),
+                ),
+                DropdownButton<Status>(
+                  value: _selectedStatus,
+                  onChanged: (Status? newStatus) {
+                    setState(() {
+                      _selectedStatus = newStatus!;
+                    });
+                  },
+                  items: Status.values.map((status) {
+                    return DropdownMenuItem(
+                      value: status,
+                      child: Text(status.toString().split('.').last),
+                    );
+                  }).toList(),
+                ),
+                DropdownButton<Priority>(
+                  value: _selectedPriority,
+                  onChanged: (Priority? newPriority) {
+                    setState(() {
+                      _selectedPriority = newPriority!;
+                    });
+                  },
+                  items: Priority.values.map((priority) {
+                    return DropdownMenuItem(
+                      value: priority,
+                      child: Text(priority.toString().split('.').last),
+                    );
+                  }).toList(),
+                ),
+                ElevatedButton(
+                  onPressed: _addTask,
+                  child: Text('Add Task'),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

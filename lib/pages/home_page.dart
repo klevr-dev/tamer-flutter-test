@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:tamer_task/pages/add_task_page.dart';
 import 'package:tamer_task/pages/task_details.dart';
@@ -19,6 +21,19 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _loadTasks();
+  }
+
+  Future<void> _pickImage(Task t) async {
+    File? image;
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        image = File(pickedFile.path);
+        t.imagePath = image!.path;
+        _dbHelper.updateTask(t);
+      });
+    }
   }
 
   Future<void> _loadTasks() async {
@@ -65,8 +80,29 @@ class _HomePageState extends State<HomePage> {
                       tileColor: task.status == Status.completed
                           ? Colors.lightGreen
                           : Colors.transparent,
-                      leading:
-                          IconButton(onPressed: () {}, icon: Icon(Icons.image)),
+                      leading: SizedBox(
+                        width: 60,
+                        height: 60,
+                        child: IconButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () {
+                              _pickImage(task);
+                            },
+                            icon: task.imagePath == null
+                                ? Icon(
+                                    Icons.image,
+                                    size: 40,
+                                  )
+                                : ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: Image.file(
+                                      File(task.imagePath!),
+                                      fit: BoxFit.cover,
+                                      width: 60,
+                                      height: 60,
+                                    ),
+                                  )),
+                      ),
                       title: Text(task.title!),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
