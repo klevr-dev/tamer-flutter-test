@@ -93,6 +93,15 @@ class _TaskPageState extends State<AddTaskPage> {
                   controller: _descriptionController,
                   decoration: InputDecoration(labelText: 'Description'),
                 ),
+                SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  "Status: ",
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
                 DropdownButton<Status>(
                   value: _selectedStatus,
                   onChanged: (Status? newStatus) {
@@ -107,6 +116,15 @@ class _TaskPageState extends State<AddTaskPage> {
                     );
                   }).toList(),
                 ),
+                SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  "Priority: ",
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
                 DropdownButton<Priority>(
                   value: _selectedPriority,
                   onChanged: (Priority? newPriority) {
@@ -120,6 +138,9 @@ class _TaskPageState extends State<AddTaskPage> {
                       child: Text(priority.toString().split('.').last),
                     );
                   }).toList(),
+                ),
+                SizedBox(
+                  height: 20,
                 ),
                 ElevatedButton(
                   onPressed: _addTask,

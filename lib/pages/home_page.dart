@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:tamer_task/pages/add_task_page.dart';
 import 'package:tamer_task/pages/task_details.dart';
 import '../db/database_helper.dart';
+import '../models/priority_enum.dart';
 import '../models/status_enum.dart';
 import '../models/task_model.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,6 +17,12 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _dbHelper = DatabaseHelper();
   List<Task> _tasks = [];
+  List<Priority> selectedPriority = [];
+  List<Status> selectedStatus = [
+    Status.completed,
+    Status.in_progress,
+    Status.pending
+  ];
 
   @override
   void initState() {
@@ -43,14 +50,78 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void _filterTasks() {
+    List<Task> filteredTasks = _tasks.where((task) {
+      return selectedPriority.contains(task.priority) &&
+          selectedStatus.contains(task.status);
+    }).toList();
+    setState(() {
+      _tasks = filteredTasks;
+    });
+  }
+
+  void _showFilterMenu() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            actionsAlignment: MainAxisAlignment.center,
+            title: Text("Filter Tasks"),
+            content: SingleChildScrollView(
+              child: Column(
+                  children: Priority.values.map((priority) {
+                return CheckboxListTile(
+                    title: Text(priority.toString()),
+                    value: selectedPriority.contains(priority),
+                    onChanged: (bool? selected) {
+                      setState(() {
+                        if (selected ?? false) {
+                          selectedPriority.add(priority);
+                        } else {
+                          selectedPriority.remove(priority);
+                        }
+                        _filterTasks();
+                      });
+                    });
+              }).toList()),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text("Apply Filters"),
+                onPressed: () {
+                  setState(() {
+                    _filterTasks();
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text("Clear Filters"),
+                onPressed: () {
+                  setState(() {
+                    selectedPriority.clear();
+                    selectedStatus.clear();
+                    _filterTasks();
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('All Tasks'),
+        title: Text(
+          'All Tasks',
+          style: TextStyle(fontSize: 32),
+        ),
         actions: [
           IconButton(
-            icon: Icon(size: 30, Icons.add),
+            icon: Icon(size: 40, Icons.add),
             onPressed: () async {
               final result = await Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const AddTaskPage()));
@@ -58,6 +129,10 @@ class _HomePageState extends State<HomePage> {
                 _loadTasks();
               }
             },
+          ),
+          IconButton(
+            icon: Icon(size: 30, Icons.filter_alt),
+            onPressed: _showFilterMenu,
           ),
         ],
       ),
