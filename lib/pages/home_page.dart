@@ -17,12 +17,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _dbHelper = DatabaseHelper();
   List<Task> _tasks = [];
+  List<Task> _filteredTasks = [];
   List<Priority> selectedPriority = [];
-  List<Status> selectedStatus = [
-    Status.completed,
-    Status.in_progress,
-    Status.pending
-  ];
+  List<Status> selectedStatus = [];
 
   @override
   void initState() {
@@ -47,66 +44,94 @@ class _HomePageState extends State<HomePage> {
     List<Task> tasks = await _dbHelper.getTasks();
     setState(() {
       _tasks = tasks;
+      _filteredTasks = _tasks;
     });
   }
 
-  void _filterTasks() {
-    List<Task> filteredTasks = _tasks.where((task) {
-      return selectedPriority.contains(task.priority) &&
-          selectedStatus.contains(task.status);
-    }).toList();
+  Future<void> _filterTasks() async {
     setState(() {
-      _tasks = filteredTasks;
+      if (selectedPriority.isEmpty && selectedStatus.isEmpty) {
+        _filteredTasks = _tasks;
+      } else {
+        _filteredTasks = _tasks.where((task) {
+          return (selectedPriority.contains(task.priority)) ||
+              (selectedStatus.contains(task.status));
+        }).toList();
+      }
     });
   }
 
   void _showFilterMenu() {
+    List<Priority> tempSelectedPriority = selectedPriority;
+    List<Status> tempSelectedStatus = selectedStatus;
     showDialog(
         context: context,
         builder: (context) {
-          return AlertDialog(
-            actionsAlignment: MainAxisAlignment.center,
-            title: Text("Filter Tasks"),
-            content: SingleChildScrollView(
-              child: Column(
-                  children: Priority.values.map((priority) {
-                return CheckboxListTile(
-                    title: Text(priority.toString()),
-                    value: selectedPriority.contains(priority),
-                    onChanged: (bool? selected) {
+          return StatefulBuilder(
+            builder: (BuildContext context, setState) {
+              return AlertDialog(
+                actionsAlignment: MainAxisAlignment.center,
+                title: Text("Filter Tasks"),
+                content: SingleChildScrollView(
+                  child: Column(
+                    children: Priority.values.map((priority) {
+                      return CheckboxListTile(
+                          title: Text(priority.toString()),
+                          value: tempSelectedPriority.contains(priority),
+                          onChanged: (bool? selected) {
+                            setState(() {
+                              if (selected ?? false) {
+                                tempSelectedPriority.add(priority);
+                              } else {
+                                tempSelectedPriority.remove(priority);
+                              }
+                            });
+                          });
+                    }).toList()
+                      ..addAll(
+                        Status.values.map((status) {
+                          return CheckboxListTile(
+                              title: Text(status.toString()),
+                              value: tempSelectedStatus.contains(status),
+                              onChanged: (bool? selected) {
+                                setState(() {
+                                  if (selected ?? false) {
+                                    tempSelectedStatus.add(status);
+                                  } else {
+                                    tempSelectedStatus.remove(status);
+                                  }
+                                });
+                              });
+                        }).toList(),
+                      ),
+                  ),
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text("Apply Filters"),
+                    onPressed: () {
                       setState(() {
-                        if (selected ?? false) {
-                          selectedPriority.add(priority);
-                        } else {
-                          selectedPriority.remove(priority);
-                        }
+                        selectedStatus = tempSelectedStatus;
+                        selectedPriority = tempSelectedPriority;
                         _filterTasks();
                       });
-                    });
-              }).toList()),
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: Text("Apply Filters"),
-                onPressed: () {
-                  setState(() {
-                    _filterTasks();
-                  });
-                  Navigator.of(context).pop();
-                },
-              ),
-              TextButton(
-                child: Text("Clear Filters"),
-                onPressed: () {
-                  setState(() {
-                    selectedPriority.clear();
-                    selectedStatus.clear();
-                    _filterTasks();
-                  });
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  TextButton(
+                    child: Text("Clear Filters"),
+                    onPressed: () {
+                      setState(() {
+                        selectedPriority.clear();
+                        selectedStatus.clear();
+                        _loadTasks();
+                      });
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
           );
         });
   }
@@ -136,15 +161,15 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: _tasks.isEmpty
+      body: _filteredTasks.isEmpty
           ? Center(child: Text('No tasks available.'))
           : Padding(
               padding: const EdgeInsets.all(8.0),
               child: ListView.builder(
                 scrollDirection: Axis.vertical,
-                itemCount: _tasks.length,
+                itemCount: _filteredTasks.length,
                 itemBuilder: (context, index) {
-                  final task = _tasks[index];
+                  final task = _filteredTasks[index];
                   return Padding(
                     padding: const EdgeInsets.all(4.0),
                     child: ListTile(
