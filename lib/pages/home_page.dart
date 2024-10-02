@@ -8,6 +8,8 @@ import '../models/priority_enum.dart';
 import '../models/status_enum.dart';
 import '../models/task_model.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:grouped_list/grouped_list.dart';
+import 'package:collection/collection.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -74,22 +76,33 @@ class _HomePageState extends State<HomePage> {
                 title: Text("Filter Tasks"),
                 content: SingleChildScrollView(
                   child: Column(
-                    children: Priority.values.map((priority) {
-                      return CheckboxListTile(
-                          title: Text(priority.toString()),
-                          value: tempSelectedPriority.contains(priority),
-                          onChanged: (bool? selected) {
-                            setState(() {
-                              if (selected ?? false) {
-                                tempSelectedPriority.add(priority);
-                              } else {
-                                tempSelectedPriority.remove(priority);
-                              }
-                            });
-                          });
-                    }).toList()
-                      ..addAll(
-                        Status.values.map((status) {
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Priority"),
+                      SizedBox(height: 10),
+                      Column(
+                        children: Priority.values.map((priority) {
+                          return CheckboxListTile(
+                              title: Text(priority.toString()),
+                              value: tempSelectedPriority.contains(priority),
+                              onChanged: (bool? selected) {
+                                setState(() {
+                                  if (selected ?? false) {
+                                    tempSelectedPriority.add(priority);
+                                  } else {
+                                    tempSelectedPriority.remove(priority);
+                                  }
+                                });
+                              });
+                        }).toList(),
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Text("Status"),
+                      SizedBox(height: 10),
+                      Column(
+                        children: Status.values.map((status) {
                           return CheckboxListTile(
                               title: Text(status.toString()),
                               value: tempSelectedStatus.contains(status),
@@ -104,6 +117,7 @@ class _HomePageState extends State<HomePage> {
                               });
                         }).toList(),
                       ),
+                    ],
                   ),
                 ),
                 actions: <Widget>[
@@ -136,8 +150,14 @@ class _HomePageState extends State<HomePage> {
         });
   }
 
+  Map<Status, List<Task>> groupTasksByStatus(List<Task> tasks) {
+    return groupBy(tasks, (Task task) => task.status!);
+  }
+
   @override
   Widget build(BuildContext context) {
+    var groupedTasks = groupTasksByStatus(_filteredTasks);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -163,96 +183,106 @@ class _HomePageState extends State<HomePage> {
       ),
       body: _filteredTasks.isEmpty
           ? Center(child: Text('No tasks available.'))
-          : Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ListView.builder(
-                scrollDirection: Axis.vertical,
-                itemCount: _filteredTasks.length,
-                itemBuilder: (context, index) {
-                  final task = _filteredTasks[index];
-                  return Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: ListTile(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16.0)),
-                      splashColor: task.status == Status.completed
-                          ? Colors.transparent
-                          : Colors.grey,
-                      tileColor: task.status == Status.completed
-                          ? Colors.lightGreen
-                          : Colors.transparent,
-                      leading: SizedBox(
-                        width: 60,
-                        height: 60,
-                        child: IconButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () {
-                              _pickImage(task);
-                            },
-                            icon: task.imagePath == null
-                                ? Icon(
-                                    Icons.image,
-                                    size: 40,
-                                  )
-                                : ClipRRect(
-                                    borderRadius: BorderRadius.circular(16),
-                                    child: Image.file(
-                                      File(task.imagePath!),
-                                      fit: BoxFit.cover,
-                                      width: 60,
-                                      height: 60,
-                                    ),
-                                  )),
+          : ListView(
+              children: [
+                for (Status status in groupedTasks.keys) ...[
+                  if (groupedTasks[status]!.isNotEmpty) ...[
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        '${status.toString()} Tasks',
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold),
                       ),
-                      title: Text(task.title!),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Priority: ${task.priority.toString().split('.').last}',
-                          ),
-                          Text(
-                            'Status: ${task.status.toString().split('.').last}',
-                          ),
-                        ],
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          task.status == Status.completed
-                              ? SizedBox()
-                              : IconButton(
-                                  icon: Icon(Icons.check),
-                                  onPressed: () {
-                                    task.status = Status.completed;
-                                    _dbHelper.updateTaskStatus(task);
-                                    setState(() {
-                                      _loadTasks();
-                                    });
-                                  },
-                                ),
-                          IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () {
-                              _deleteTask(task.id!);
-                            },
-                          )
-                        ],
-                      ),
-                      onTap: () async {
-                        final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    TaskDetails(currentTask: task)));
-                        if (result == true) {
-                          _loadTasks();
-                        }
-                      },
                     ),
-                  );
-                },
-              ),
+                    for (var task in groupedTasks[status]!)
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: ListTile(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16.0)),
+                          splashColor: task.status == Status.completed
+                              ? Colors.transparent
+                              : Colors.grey,
+                          tileColor: task.status == Status.completed
+                              ? Colors.lightGreen
+                              : Colors.transparent,
+                          leading: SizedBox(
+                            width: 60,
+                            height: 60,
+                            child: IconButton(
+                                padding: EdgeInsets.zero,
+                                onPressed: () {
+                                  _pickImage(task);
+                                },
+                                icon: task.imagePath == null
+                                    ? Icon(
+                                        Icons.image,
+                                        size: 40,
+                                      )
+                                    : ClipRRect(
+                                        borderRadius: BorderRadius.circular(16),
+                                        child: Image.file(
+                                          File(task.imagePath!),
+                                          fit: BoxFit.cover,
+                                          width: 60,
+                                          height: 60,
+                                        ),
+                                      )),
+                          ),
+                          title: Text(task.title!),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Priority: ${task.priority.toString()}',
+                              ),
+                              Text(
+                                'Status: ${task.status.toString()}',
+                              ),
+                            ],
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              task.status == Status.completed
+                                  ? SizedBox()
+                                  : IconButton(
+                                      icon: Icon(Icons.check),
+                                      onPressed: () {
+                                        task.status = Status.completed;
+                                        _dbHelper.updateTaskStatus(task);
+                                        setState(() {
+                                          _loadTasks();
+                                        });
+                                      },
+                                    ),
+                              IconButton(
+                                icon: Icon(Icons.delete),
+                                onPressed: () {
+                                  _deleteTask(task.id!);
+                                  setState(() {
+                                    _loadTasks();
+                                  });
+                                },
+                              )
+                            ],
+                          ),
+                          onTap: () async {
+                            final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        TaskDetails(currentTask: task)));
+                            if (result == true) {
+                              _loadTasks();
+                            }
+                          },
+                        ),
+                      ),
+                  ]
+                ],
+              ],
             ),
     );
   }
