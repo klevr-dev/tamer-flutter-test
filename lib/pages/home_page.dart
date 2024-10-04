@@ -46,7 +46,7 @@ class _HomePageState extends State<HomePage> {
     List<Task> tasks = await _dbHelper.getTasks();
     setState(() {
       _tasks = tasks;
-      _filteredTasks = _tasks;
+      _filterTasks();
     });
   }
 
@@ -161,7 +161,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'All Tasks',
+          'My Tasks',
           style: TextStyle(fontSize: 32),
         ),
         actions: [

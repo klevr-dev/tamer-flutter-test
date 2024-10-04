@@ -65,8 +65,7 @@ class _TaskPageState extends State<AddTaskPage> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Task Page",
-      theme: ThemeData(
-          scaffoldBackgroundColor: Colors.blueGrey, hintColor: Colors.blue),
+      theme: ThemeData(hintColor: Colors.blue),
       home: Scaffold(
         appBar: AppBar(
           title: Text('Task Manager'),
