@@ -8,6 +8,7 @@ class Task {
   String? imagePath;
   Status? status;
   Priority? priority;
+  DateTime? date;
 
   Task(
       {this.id,
@@ -15,7 +16,8 @@ class Task {
       this.imagePath,
       required this.title,
       required this.status,
-      required this.priority});
+      required this.priority,
+      required this.date});
 
   Map<String, dynamic> toMap() {
     return {
@@ -25,6 +27,7 @@ class Task {
       'imagePath': imagePath,
       'status': status?.index,
       'priority': priority?.index,
+      'date': date?.toIso8601String()
     };
   }
 
@@ -36,6 +39,7 @@ class Task {
       imagePath: map['imagePath'],
       status: Status.values[map['status']],
       priority: Priority.values[map['priority']],
+      date: DateTime.parse(map['date']),
     );
   }
 }

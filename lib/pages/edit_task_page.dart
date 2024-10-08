@@ -16,6 +16,7 @@ class _EditTaskPageState extends State<EditTaskPage>
     with TickerProviderStateMixin {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _dateController = TextEditingController();
   late TabController _tabControllerPriority;
   late TabController _tabControllerStatus;
 
@@ -24,6 +25,7 @@ class _EditTaskPageState extends State<EditTaskPage>
     super.initState();
     _titleController.text = widget.currentTask.title!;
     _descriptionController.text = widget.currentTask.description ?? '';
+    _dateController.text = widget.currentTask.date as String;
     _tabControllerPriority = TabController(length: 2, vsync: this);
     _tabControllerStatus = TabController(length: 3, vsync: this);
 
@@ -39,6 +41,20 @@ class _EditTaskPageState extends State<EditTaskPage>
     return Status.values[index];
   }
 
+  Future<void> selectDate() async {
+    DateTime? _picked = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2100));
+
+    if (_picked != null) {
+      setState(() {
+        _dateController.text = _picked.toIso8601String();
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,14 +65,14 @@ class _EditTaskPageState extends State<EditTaskPage>
             icon: Icon(Icons.check),
             onPressed: () {
               Task updatedTask = Task(
-                id: widget.currentTask.id,
-                title: _titleController.text,
-                description: _descriptionController.text,
-                imagePath: widget.currentTask.imagePath,
-                status: _getStatusFromTabIndex(_tabControllerStatus.index),
-                priority:
-                    _getPriorityFromTabIndex(_tabControllerPriority.index),
-              );
+                  id: widget.currentTask.id,
+                  title: _titleController.text,
+                  description: _descriptionController.text,
+                  imagePath: widget.currentTask.imagePath,
+                  status: _getStatusFromTabIndex(_tabControllerStatus.index),
+                  priority:
+                      _getPriorityFromTabIndex(_tabControllerPriority.index),
+                  date: DateTime.tryParse(_dateController.text));
 
               Navigator.pop(context, updatedTask);
             },

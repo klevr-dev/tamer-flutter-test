@@ -18,6 +18,8 @@ class _TaskPageState extends State<AddTaskPage> {
 
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _dateController = TextEditingController();
+
   Status _selectedStatus = Status.pending;
   Priority _selectedPriority = Priority.low;
 
@@ -42,6 +44,7 @@ class _TaskPageState extends State<AddTaskPage> {
       description: _descriptionController.text,
       status: _selectedStatus,
       priority: _selectedPriority,
+      date: DateTime.tryParse(_dateController.text),
     );
     await _dbHelper.addTask(newTask);
     print(newTask);
@@ -58,6 +61,20 @@ class _TaskPageState extends State<AddTaskPage> {
     setState(() {
       _tasks.removeWhere((task) => task.id == id);
     });
+  }
+
+  Future<void> selectDate() async {
+    DateTime? _picked = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2100));
+
+    if (_picked != null) {
+      setState(() {
+        _dateController.text = _picked.toIso8601String();
+      });
+    }
   }
 
   @override
@@ -91,6 +108,17 @@ class _TaskPageState extends State<AddTaskPage> {
                   maxLines: null,
                   controller: _descriptionController,
                   decoration: InputDecoration(labelText: 'Description'),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                TextField(
+                  controller: _dateController,
+                  decoration: InputDecoration(
+                      labelText: 'Date',
+                      filled: true,
+                      prefixIcon: Icon(Icons.calendar_month)),
+                  onTap: selectDate,
                 ),
                 SizedBox(
                   height: 20,
