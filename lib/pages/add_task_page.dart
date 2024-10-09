@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../db/database_helper.dart';
 import '../models/priority_enum.dart';
 import '../models/status_enum.dart';
@@ -39,28 +40,27 @@ class _TaskPageState extends State<AddTaskPage> {
   Future<void> _addTask() async {
     if (_titleController.text.isEmpty) return;
 
+    if (_dateController.text.isEmpty) return;
+
+    final DateFormat formatter = DateFormat.yMMMd();
+    DateTime? parsedDate = formatter.parse(_dateController.text);
+
     Task newTask = Task(
       title: _titleController.text,
       description: _descriptionController.text,
       status: _selectedStatus,
       priority: _selectedPriority,
-      date: DateTime.tryParse(_dateController.text),
+      date: parsedDate,
     );
     await _dbHelper.addTask(newTask);
-    print(newTask);
+
     _titleController.clear();
     _descriptionController.clear();
+    _dateController.clear();
     setState(() {
       _tasks.add(newTask);
     });
     Navigator.pop(context, true);
-  }
-
-  Future<void> _deleteTask(int id) async {
-    await _dbHelper.deleteTask(id);
-    setState(() {
-      _tasks.removeWhere((task) => task.id == id);
-    });
   }
 
   Future<void> selectDate() async {
@@ -72,7 +72,7 @@ class _TaskPageState extends State<AddTaskPage> {
 
     if (_picked != null) {
       setState(() {
-        _dateController.text = _picked.toIso8601String();
+        _dateController.text = DateFormat.yMMMd().format(_picked);
       });
     }
   }

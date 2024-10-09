@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../models/priority_enum.dart';
 import '../models/status_enum.dart';
 import '../models/task_model.dart'; // Import your Task model
@@ -25,7 +26,7 @@ class _EditTaskPageState extends State<EditTaskPage>
     super.initState();
     _titleController.text = widget.currentTask.title!;
     _descriptionController.text = widget.currentTask.description ?? '';
-    _dateController.text = widget.currentTask.date as String;
+    _dateController.text = DateFormat.yMMMd().format(widget.currentTask.date!);
     _tabControllerPriority = TabController(length: 2, vsync: this);
     _tabControllerStatus = TabController(length: 3, vsync: this);
 
@@ -50,7 +51,7 @@ class _EditTaskPageState extends State<EditTaskPage>
 
     if (_picked != null) {
       setState(() {
-        _dateController.text = _picked.toIso8601String();
+        _dateController.text = DateFormat.yMMMd().format(_picked);
       });
     }
   }
@@ -64,6 +65,9 @@ class _EditTaskPageState extends State<EditTaskPage>
           IconButton(
             icon: Icon(Icons.check),
             onPressed: () {
+              final DateFormat formatter = DateFormat.yMMMd();
+              DateTime? parsedDate = formatter.parse(_dateController.text);
+
               Task updatedTask = Task(
                   id: widget.currentTask.id,
                   title: _titleController.text,
@@ -72,8 +76,7 @@ class _EditTaskPageState extends State<EditTaskPage>
                   status: _getStatusFromTabIndex(_tabControllerStatus.index),
                   priority:
                       _getPriorityFromTabIndex(_tabControllerPriority.index),
-                  date: DateTime.tryParse(_dateController.text));
-
+                  date: parsedDate);
               Navigator.pop(context, updatedTask);
             },
           ),
@@ -96,6 +99,17 @@ class _EditTaskPageState extends State<EditTaskPage>
                 maxLines: null,
                 controller: _descriptionController,
                 decoration: InputDecoration(labelText: 'Task Description'),
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              TextField(
+                controller: _dateController,
+                decoration: InputDecoration(
+                    labelText: 'Date',
+                    filled: true,
+                    prefixIcon: Icon(Icons.calendar_month)),
+                onTap: selectDate,
               ),
               SizedBox(
                 height: 15,

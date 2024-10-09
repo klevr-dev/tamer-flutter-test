@@ -183,7 +183,7 @@ class _HomePageState extends State<HomePage>
           brightness: Brightness.light,
           primaryColor: Colors.blue,
           appBarTheme: AppBarTheme(
-            backgroundColor: Colors.grey,
+            backgroundColor: Colors.grey[200],
           )),
       darkTheme: ThemeData(
         brightness: Brightness.dark,

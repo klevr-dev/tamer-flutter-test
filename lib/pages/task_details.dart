@@ -4,6 +4,7 @@ import '../db/database_helper.dart';
 import '../models/status_enum.dart';
 import '../models/task_model.dart';
 import 'edit_task_page.dart';
+import 'package:intl/intl.dart';
 
 class TaskDetails extends StatefulWidget {
   final Task currentTask;
@@ -86,6 +87,11 @@ class _TaskDetailsState extends State<TaskDetails> {
                         fontStyle: FontStyle.italic,
                         color: Colors.black),
                   ),
+                SizedBox(
+                  height: 20,
+                ),
+                Text("Date: ${DateFormat.yMMMd().format(_task.date!)}",
+                    style: TextStyle(fontSize: 16)),
                 SizedBox(
                   height: 20,
                 ),

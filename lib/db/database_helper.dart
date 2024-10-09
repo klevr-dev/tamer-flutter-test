@@ -42,7 +42,8 @@ class DatabaseHelper {
             description TEXT,
             imagePath TEXT,
             status INTEGER,
-            priority INTEGER
+            priority INTEGER,
+            date TEXT
           )
         ''');
       },
