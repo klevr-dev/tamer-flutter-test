@@ -5,6 +5,8 @@ import '../db/database_helper.dart';
 import '../models/priority_enum.dart';
 import '../models/status_enum.dart';
 import '../models/task_model.dart';
+import 'package:device_calendar/device_calendar.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class AddTaskPage extends StatefulWidget {
   const AddTaskPage({super.key});
@@ -16,6 +18,7 @@ class AddTaskPage extends StatefulWidget {
 class _TaskPageState extends State<AddTaskPage> {
   final _dbHelper = DatabaseHelper();
   List<Task> _tasks = [];
+  final DeviceCalendarPlugin _deviceCalendarPlugin = DeviceCalendarPlugin();
 
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -53,6 +56,7 @@ class _TaskPageState extends State<AddTaskPage> {
       date: parsedDate,
     );
     await _dbHelper.addTask(newTask);
+    addTaskToCalendar(newTask);
 
     _titleController.clear();
     _descriptionController.clear();
@@ -75,6 +79,32 @@ class _TaskPageState extends State<AddTaskPage> {
         _dateController.text = DateFormat.yMMMd().format(_picked);
       });
     }
+  }
+
+  Future<void> addTaskToCalendar(Task task) async {
+    var permissionsGranted = await _deviceCalendarPlugin.requestPermissions();
+    if (!permissionsGranted.isSuccess || !permissionsGranted.data!) {
+      return;
+    }
+    print("permission granted");
+    var calendarsResult = await _deviceCalendarPlugin.retrieveCalendars();
+    if (!calendarsResult.isSuccess || calendarsResult.data == null) {
+      return;
+    }
+    print("calendar received");
+    var calendarId = calendarsResult.data!.first.id;
+
+    final tz.TZDateTime startTime = tz.TZDateTime.from(task.date!, tz.local);
+    final tz.TZDateTime endTime =
+        startTime.add(Duration(hours: (24 - startTime.hour)));
+
+    var event = Event(calendarId,
+        title: task.title!,
+        description: task.description,
+        start: startTime,
+        end: endTime);
+
+    await _deviceCalendarPlugin.createOrUpdateEvent(event);
   }
 
   @override
