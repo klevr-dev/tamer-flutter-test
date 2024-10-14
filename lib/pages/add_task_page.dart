@@ -82,29 +82,42 @@ class _TaskPageState extends State<AddTaskPage> {
   }
 
   Future<void> addTaskToCalendar(Task task) async {
+    // Request calendar permissions first
     var permissionsGranted = await _deviceCalendarPlugin.requestPermissions();
-    if (!permissionsGranted.isSuccess || !permissionsGranted.data!) {
-      return;
+    if (permissionsGranted.isSuccess && permissionsGranted.data!) {
+      var calendarsResult = await _deviceCalendarPlugin.retrieveCalendars();
+
+      if (calendarsResult.isSuccess &&
+          calendarsResult.data != null &&
+          calendarsResult.data!.isNotEmpty) {
+        var calendarId = calendarsResult.data!.first.id;
+
+        final tz.TZDateTime startTime =
+            tz.TZDateTime.from(task.date!, tz.local);
+        final tz.TZDateTime endTime =
+            startTime.add(Duration(hours: (24 - startTime.hour)));
+
+        var event = Event(
+          calendarId,
+          title: task.title,
+          description: task.description,
+          start: startTime,
+          end: endTime,
+        );
+
+        var createEventResult =
+            await _deviceCalendarPlugin.createOrUpdateEvent(event);
+        if (createEventResult!.isSuccess) {
+          print("Task successfully added to the calendar");
+        } else {
+          print("Failed to add task to the calendar");
+        }
+      } else {
+        print("No calendars found, please add a calendar first.");
+      }
+    } else {
+      print("Calendar permissions not granted");
     }
-    print("permission granted");
-    var calendarsResult = await _deviceCalendarPlugin.retrieveCalendars();
-    if (!calendarsResult.isSuccess || calendarsResult.data == null) {
-      return;
-    }
-    print("calendar received");
-    var calendarId = calendarsResult.data!.first.id;
-
-    final tz.TZDateTime startTime = tz.TZDateTime.from(task.date!, tz.local);
-    final tz.TZDateTime endTime =
-        startTime.add(Duration(hours: (24 - startTime.hour)));
-
-    var event = Event(calendarId,
-        title: task.title!,
-        description: task.description,
-        start: startTime,
-        end: endTime);
-
-    await _deviceCalendarPlugin.createOrUpdateEvent(event);
   }
 
   @override

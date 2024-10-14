@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "169120478761",
+    "project_id": "taskapp-f9f5f",
+    "storage_bucket": "taskapp-f9f5f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:169120478761:android:12cc258a22ac0553164e38",
+        "android_client_info": {
+          "package_name": "com.example.tamer_task"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBw81KufHub0T34pAyhOgGomw6arjQLH48"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
