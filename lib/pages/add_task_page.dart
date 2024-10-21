@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:tamer_task/firebase_methods.dart';
 import '../db/database_helper.dart';
 import '../models/priority_enum.dart';
 import '../models/status_enum.dart';
@@ -57,6 +58,8 @@ class _TaskPageState extends State<AddTaskPage> {
     );
     await _dbHelper.addTask(newTask);
     addTaskToCalendar(newTask);
+
+    await addTaskToFirestore(newTask);
 
     _titleController.clear();
     _descriptionController.clear();
